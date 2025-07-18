@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>OIDC リダイレクト スタブ</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #333;
+    }
+    .container {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 1em 2em;
+      border-radius: 8px;
+      max-width: 600px;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+    dt {
+      font-weight: bold;
+      margin-top: 1em;
+    }
+    dd {
+      margin-left: 1em;
+      margin-bottom: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>OIDC リダイレクト結果</h1>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // URLのクエリパラメータをパースする関数
+    function parseQueryParams() {
+      const params = {};
+      const queryString = window.location.search.substring(1);
+      const pairs = queryString.split("&");
+      for (const pair of pairs) {
+        if (!pair) continue;
+        const [key, value] = pair.split("=");
+        params[decodeURIComponent(key)] = decodeURIComponent(value || "");
+      }
+      return params;
+    }
+
+    const params = parseQueryParams();
+    const resultDiv = document.getElementById("result");
+
+    if (params.code) {
+      // 認可コードがある場合
+      resultDiv.innerHTML = `
+        <p class="success">認可コードを受け取りました。</p>
+        <dl>
+          <dt>code</dt><dd>${params.code}</dd>
+          <dt>state</dt><dd>${params.state || "(なし)"}</dd>
+          <dt>iss (Issuer)</dt><dd>${params.iss || "(なし)"}</dd>
+        </dl>
+      `;
+    }
+    else if (params.error) {
+      // エラーがある場合
+      resultDiv.innerHTML = `
+        <p class="error">エラーが発生しました。</p>
+        <dl>
+          <dt>error</dt><dd>${params.error}</dd>
+          <dt>error_description</dt><dd>${params.error_description || "(なし)"}</dd>
+          <dt>state</dt><dd>${params.state || "(なし)"}</dd>
+          <dt>iss (Issuer)</dt><dd>${params.iss || "(なし)"}</dd>
+        </dl>
+      `;
+    }
+    else {
+      resultDiv.textContent = "認可コードまたはエラー情報がURLに含まれていません。";
+    }
+  </script>
+</body>
+</html>
